@@ -1,36 +1,46 @@
 import Head from 'next/head'
 import { fetchApi, baseUrl } from '../utils/fetchApi';
+import Container from '@mui/material/Container';
+import Grid from '@mui/material/Grid';
+import { makeStyles } from '@material-ui/core/styles';
+import Header from '../components/Header';
+import PropertyCard from '../components/PropertyCard';
+
+const useStyles = makeStyles((theme) => ({
+  root: {
+    flexGrow: 1,
+  }
+}));
 
 export default function Home({ propertyForSale, propertyForRent }) {
+  console.log(propertyForSale);
+  const classes = useStyles();
   return (
     <div>
       <Head>
         <title>Welcome to City Homes</title>
         <meta name="description" content="Buy or rent properties" />
       </Head>
-      <h1>Welcome to City Homes</h1>
+      <Header />
+      <Container maxWidth="md">
+        <Grid container className={classes.root} spacing={2}>
+          {propertyForSale.map(property => <PropertyCard property={property} key={property.id} />)}
+        </Grid>
+      </Container>
     </div>
   )
 }
 
 export async function getStaticProps() {
   const saleParams = {
-    locationExternalIDs: '5002,6020',
+    locationExternalIDs: '5002',
     purpose: 'for-sale',
-    hitsPerPage: '10',
-    page: '0',
-    lang: 'en',
-    sort: 'city-level-score',
-    rentFrequency: 'monthly'
+    hitsPerPage: '10'
   };
   const rentParams = {
-    locationExternalIDs: '5002,6020',
+    locationExternalIDs: '5002',
     purpose: 'for-rent',
-    hitsPerPage: '10',
-    page: '0',
-    lang: 'en',
-    sort: 'city-level-score',
-    rentFrequency: 'monthly'
+    hitsPerPage: '10'
   };
   const propertyForSale = await fetchApi(`${baseUrl}/properties/list`, saleParams);
   const propertyForRent = await fetchApi(`${baseUrl}/properties/list`, rentParams);
